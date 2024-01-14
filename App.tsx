@@ -1,13 +1,10 @@
 
-import {Text, View} from "react-native"
-export default function App(){
-  return(
-    <View>
-      <Text> React Native</Text>  
-      <Text> Testando</Text> 
-    </View>
+import { Home } from "./src/screens/Home"
+export default function App() {
+  return (
+    <Home />
   )
-  
+
 }
 
 /*import { StatusBar } from 'expo-status-bar';
