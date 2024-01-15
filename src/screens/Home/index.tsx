@@ -1,16 +1,39 @@
-import { Text, TextInput, View, TouchableOpacity, ScrollView } from "react-native"
+import { Text, TextInput, View, TouchableOpacity, FlatList, Alert } from "react-native"
 import { styles } from "./style"
 import { Participant } from "../../components/Participant";
+import { useState } from "react";
 export function Home() {
+
+    const [participants, setParticipants] = useState<string[]>([]);
+    const [participant, setParticipant] = useState("");
+
+
     function handleParticipantAdd() {
-        console.log("Você clicou no botão.");
+        if (participant === "") {
+            return Alert.alert("Campo em branco", "Favor digitar um nome no campo.");
+        }
+        if (participants.includes(participant)) {
+            return Alert.alert("Participante existe", `${participant} já existe em nossa aplicação`);
+        }
+        setParticipants(prevState => [...prevState, participant]);
+        setParticipant("");
     }
 
     function handleParticipantRemove(name: string) {
-        console.log(`Você clicou no botão remover o usuário - ${name}`);
+        Alert.alert("Remover", `Deseja remover ${name}?`, [
+            {
+                text: "Sim",
+                onPress: () => {
+                    setParticipants(prevState => prevState.filter(item => item !== name));
+                }
+            },
+            {
+                text: "Não",
+                style: "cancel"
+            }
+        ]);
     }
 
-    const participants = ["Victor Oliveira", "Thales Oliveira", "Farley Oliveira", "Glaucia Oliveira", "Daniel Oliveira", "Tarcisio Oliveira", "Paula Oliveira"];
     return (
         <View style={styles.container}>
             <Text style={styles.eventName}>
@@ -24,21 +47,31 @@ export function Home() {
                     style={styles.input}
                     placeholder="Nome do participante"
                     placeholderTextColor="#6B6B6B"
+                    value={participant}
+                    onChangeText={setParticipant}
                 />
                 <TouchableOpacity style={styles.button} onPress={handleParticipantAdd}>
                     <Text style={styles.buttonText}>+</Text>
                 </TouchableOpacity>
             </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {
-                    participants.map(participant => (
-                        <Participant
-                            key={participant}
-                            name={participant}
-                            onRemove={() => handleParticipantRemove(participant)} />
-                    ))
-                }
-            </ScrollView>
+            <FlatList
+                data={participants}
+                keyExtractor={item => item}
+                renderItem={({ item }) => (
+                    <Participant
+                        key={item}
+                        name={item}
+                        onRemove={() => handleParticipantRemove(item)}
+                    />
+
+                )}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={() => (
+                    <Text style={styles.listEmptytText}>
+                        Ninguém chegou no evento ainda. Adicione participantes à sua lista de presentes.
+                    </Text>
+                )}
+            />
         </View>
     )
 }
